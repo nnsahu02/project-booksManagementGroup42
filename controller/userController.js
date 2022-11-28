@@ -1,6 +1,7 @@
 const validation = require('../validation/validation')
 
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 
 const userModel = require('../model/userModel')
 
@@ -138,11 +139,11 @@ const login = async function (req, res) {
                 userId: user._id.toString(),
             },
             "group42-very-very-secret-key",
-            { expiresIn: '900s' }
+            { expiresIn: '60m' }
         );
         console.log(token)
         res.setHeader("x-auth-token", token);
-        res.status(200).send({ status: true, token: token, tokenCreatedAt: new Date(), message: "Your token will be expired in 20 Minutes." });
+        res.status(200).send({ status: true, token: token, tokenCreatedAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss"), message: "Your token will be expired in 60 Minutes." });
 
     }
     catch (error) {

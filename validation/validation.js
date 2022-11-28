@@ -67,7 +67,7 @@ const isVAlidISBN = function (ISBN){
 /*---------------------------------------------ISBN VALIDATION-------------------------------------------*/
  
 const isVAlidDate = function (releasedAt){
-    const DateRegex = /^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/;
+    const DateRegex = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/;
     return DateRegex.test(releasedAt);
     
 };

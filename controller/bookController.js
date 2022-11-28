@@ -1,7 +1,7 @@
 const bookModel = require("../model/bookModel")
 const userModel = require('../model/userModel')
 
-const { isValidObjectId } = require('mongoose')
+
 
 const validation = require('../validation/validation')
 
@@ -29,9 +29,6 @@ exports.createBook = async (req, res) => {
             return res.status(400).send({ status: false, message: "experpt is required." })
         }
         if (!userId) {
-            return res.status(400).send({ status: false, message: "userId is required." })
-        }
-        if (!isValidObjectId(userId)) {
             return res.status(400).send({ status: false, message: "userId is required." })
         }
         if (!ISBN) {
