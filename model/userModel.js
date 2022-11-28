@@ -15,17 +15,20 @@ const userModel = new mongoose.Schema(
     phone: {
       type: String,
       require: true,
-      unique: true
+      unique: true,
+      trim : true
     },
     email: {
       type: String,
       require: true,
       unique: true,
-      lowercase: true
+      lowercase: true,
+      trim : true
     },
     password: {
       type: String,
-      require: true
+      require: true,
+      trim : true
     },
     address: {
       street: {

@@ -12,7 +12,8 @@ const reviewSchema = new mongoose.Schema(
             type: String,
             required: true,
             default: 'Guest',
-            value: String
+            value: String,
+            trim : true
         },
         reviewedAt: {
             type: Date,
@@ -23,7 +24,8 @@ const reviewSchema = new mongoose.Schema(
             required: true
         },
         review: {
-            type: String
+            type: String,
+            trim : true
         },
         isDeleted: {
             type: Boolean,

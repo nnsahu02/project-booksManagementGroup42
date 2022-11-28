@@ -48,4 +48,30 @@ const isEmpty = function (value){
 };
 
 
-module.exports = {isValidName, isValidMobile, isValidEmail, isValidPassword, isValidPin, isEmpty}
+/*-----------------------------------BOOK TITLE VALIDATION -----------------------------------------------------*/
+
+
+const isValidBookTitle = function (name){
+    const nameRegex = /^[a-zA-Z0-9]+(([a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/;
+    return nameRegex.test(name);
+};
+
+/*---------------------------------------------ISBN VALIDATION-------------------------------------------*/
+ 
+const isVAlidISBN = function (ISBN){
+    const ISBNRegex = /^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/;
+    return ISBNRegex.test(ISBN);
+    
+};
+
+/*---------------------------------------------ISBN VALIDATION-------------------------------------------*/
+ 
+const isVAlidDate = function (releasedAt){
+    const DateRegex = /^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/;
+    return DateRegex.test(releasedAt);
+    
+};
+
+
+
+module.exports = {isValidName, isValidMobile, isValidEmail, isValidPassword, isValidPin, isEmpty,isValidBookTitle,isVAlidISBN,isVAlidDate}
