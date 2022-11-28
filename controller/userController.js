@@ -141,11 +141,11 @@ const login = async function (req, res) {
         name:"Raj Nagwanshi"
       },
       "functionup-lithium-very-very-secret-key",
-      {expiresIn: '15s'}
+      {expiresIn: '900s'}
     );
     console.log(token)
     res.setHeader("x-auth-token", token);
-    res.status(200).send({ status: true, token: token });
+    res.status(200).send({ status: true, token: token, tokenCreatedAt : new Date(), message : "Your token will be expired in 20 Minutes." });
 
     }
       catch(error){
