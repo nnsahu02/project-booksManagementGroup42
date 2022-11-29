@@ -6,24 +6,24 @@ const bookController = require('../controller/bookController');
 const auth = require('../middleware/auth');
 
 
-/*.........................// CREAT USER //................................................*/
+/*.........................//1// CREAT USER //..............................................*/
 router.post('/register', userController.createUser);
 
 
-/*.........................// LOGIN USER //................................................*/
+/*.........................//2// LOGIN USER //..............................................*/
 router.post('/login', userController.login);
 
 
-/*.........................// CREAT BOOKS //...............................................*/
+/*.........................//3// CREAT BOOKS //.............................................*/
 router.post('/books', auth.authentication, auth.authorisation, bookController.createBook);
 
 
-/*.........................// GET BOOK FROM PARAM //.......................................*/
-router.get('/books/:bookId', auth.authentication, bookController.getBooksfrmParam);
-
-
-/*.........................// GET BOOKS FROM QUERY //......................................*/
+/*.........................//4// GET BOOKS FROM QUERY //....................................*/
 router.get('/books',auth.authentication, bookController.getBookFrmQuery);
+
+
+/*.........................//5// GET BOOK FROM PARAM //.....................................*/
+router.get('/books/:bookId', auth.authentication, bookController.getBooksfrmParam);
 
 
 

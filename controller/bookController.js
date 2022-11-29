@@ -3,9 +3,9 @@ const userModel = require('../model/userModel')
 
 
 
+//>---------------------------------------------- VALIDATION FUNCTION------------------------------------------------<//
+
 const validation = require('../validation/validation')
-
-
 let { isEmpty, isValidBookTitle, isVAlidISBN, isVAlidDate } = validation
 
 //>-------------------------------------------------- CREAT BOOKS --------------------------------------------------<//
@@ -14,7 +14,11 @@ exports.createBook = async (req, res) => {
     try {
         let bodyData = req.body
 
-        let { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = bodyData
+        let { title, excerpt, userId, ISBN, category, subcategory, releasedAt, ...rest } = bodyData //Destructuring
+
+        if (Object.keys(rest).length != 0) { //Checking extra attributes are added or not 
+            return res.status(400).send({ msg: "Not allowed to add extra attributes" })
+        }
 
         if (Object.keys(bodyData).length = 0) {
             res.status(400).send({ status: false, message: "All fields are mandatory" })
@@ -92,14 +96,14 @@ exports.createBook = async (req, res) => {
 
 
         let checkUserId = await userModel.findById(userId)
-        if (!checkUserId) { return res.status(404).send({ status: false, message: "user not find" }) }
+        if (!checkUserId) { return res.status(404).send({ status: false, message: "user not found" }) }
 
         let createBook = await bookModel.create(bodyData)
 
         return res.status(201).send({ status: true, message: `This ${title} Book is created sucessfully.`, data: createBook })
 
     } catch (error) {
-        return res.status(500).send({ status: false, msg: error.message })
+        return res.status(500).send({ status: false, message: error.message })
     }
 }
 
@@ -135,9 +139,10 @@ exports.getBookFrmQuery = async (req, res) => {
         }
 
 
-        queryData["isDeleted"] = false
+        queryData["isDeleted"] = false //added isDeleted attribute in queryData
 
-        const bookData = await bookModel.find(queryData)
+        const bookData = await bookModel.find(queryData).select({ title : 1, excerpt : 1, userId : 1, category : 1, releasedAt : 1, reviews: 1})
+        .sort({title : 1})
 
         if (bookData.length == 0) {
             return res.status(404).send({ status: false, message: "No book found!" })
@@ -167,7 +172,7 @@ exports.getBooksfrmParam = async (req, res) => {
         const bookData = await bookModel.findById(bookId)
 
         if (!bookData) {
-            return res.status(404).send({ status: false, message: "No book find with this Id" })
+            return res.status(404).send({ status: false, message: "No book found with this Id" })
         }
 
         return res.status(200).send({ status: true, data: bookData })

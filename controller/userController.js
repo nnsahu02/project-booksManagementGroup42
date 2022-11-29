@@ -1,15 +1,20 @@
-const validation = require('../validation/validation')
-
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 
 const userModel = require('../model/userModel')
 
 
+//>-------------------------------------------------- VALIDATION --------------------------------------------------<//
+
+
+const validation = require('../validation/validation')
 let { isValidName, isValidMobile, isValidEmail, isValidPassword, isValidPin, isEmpty } = validation //Destructuring
 
 
-const createUser = async function (req, res) {
+//>-------------------------------------------------- CREAT USER --------------------------------------------------<//
+
+
+exports.createUser = async (req, res) => {
 
     try {
         let data = req.body
@@ -68,7 +73,7 @@ const createUser = async function (req, res) {
 
 
         if (!isValidName(name)) { // Name validation
-            return res.status(400).send({ status: false, message: "Name is Wrong" })
+            return res.status(400).send({ status: false, message: "Please Provide Proper Name" })
         }
 
         if (!isValidMobile(phone)) {  // Phone validation
@@ -108,14 +113,12 @@ const createUser = async function (req, res) {
 
 }
 
-module.exports.createUser = createUser
 
 
+//>-------------------------------------------------- LOGIN USER --------------------------------------------------<//
 
-/* -------------------------------------------LOGIN---------------------------------------------- */
 
-
-const login = async function (req, res) {
+exports.login = async (req, res) => {
 
     try {
 
@@ -132,7 +135,7 @@ const login = async function (req, res) {
 
         let user = await userModel.findOne({ email: email, password: password });
         if (!user)
-            return res.send({ status: false, msg: "email or password is not corerct" });
+            return res.status(400).send({ status: false, msg: "email or password is not corerct" });
 
         let token = jwt.sign(
             {
@@ -152,4 +155,3 @@ const login = async function (req, res) {
 
 };
 
-module.exports.login = login 

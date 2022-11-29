@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken')
-
 const { isValidObjectId } = require('mongoose')
 
+
+//>-------------------------------------------------- AUTHENTICATION --------------------------------------------------<//
 
 exports.authentication = async (req, res, next) => {
     try {
@@ -19,7 +20,6 @@ exports.authentication = async (req, res, next) => {
             else {
                 req.token = decodedToken
             }
-            console.log("authentication successfull")
             next()
         })
     }
@@ -30,6 +30,7 @@ exports.authentication = async (req, res, next) => {
 }
 
 
+//>-------------------------------------------------- AUTHORISATION --------------------------------------------------<//
 
 exports.authorisation = async (req, res, next) => {
     try {
@@ -45,9 +46,8 @@ exports.authorisation = async (req, res, next) => {
         const userIdfrmDecodedToken = req.token.userId
 
         if (userId !== userIdfrmDecodedToken) {
-            return res.status(403).send({ status: false, message: "Access Denied!" })
+            return res.status(401).send({ status: false, message: "Access Denied!" })
         }
-        console.log("Authorization successfull")
 
         next()
     }
