@@ -3,6 +3,7 @@ const router = express.Router();
 
 const userController = require('../controller/userController');
 const bookController = require('../controller/bookController');
+const reviewController = require('../controller/reviewController')
 const auth = require('../middleware/auth');
 
 
@@ -26,15 +27,27 @@ router.get('/books',auth.authentication, bookController.getBookFrmQuery);
 router.get('/books/:bookId', auth.authentication, bookController.getBooksfrmParam);
 
 
+/*.........................//6// UPDATE BOOK  //............................................*/
+router.put('/books/:bookId', bookController.updateBook)
 
 
+/*.........................//7// DELETE BOOK  //............................................*/
+router.delete('/books/:bookId', bookController.DeleteBook)
 
 
+/*.........................//8// CREATE REVIEW  //............................................*/
+router.post('/books/:bookId/review', auth.authentication,reviewController.review );
 
 
+/*.........................//9// UPDATE REVIEW  //............................................*/
+router.put('/books/:bookId/review/:reviewId',reviewController.updateReview);
 
 
-/*...................................... VALIDATING END POINT/PATH ...............................................*/
+/*.........................//10// DELETE REVIEW  //............................................*/
+router.delete('/books/:bookId/review/:reviewId',reviewController.DeleteReview);
+
+
+/*............................ VALIDATING END POINT/PATH ........................................*/
 
 router.all('/*', (req, res) => {
     return res.status(400).send({status : false, message : "Please provide correct path!"})
