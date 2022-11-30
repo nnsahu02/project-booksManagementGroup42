@@ -43,7 +43,8 @@ const isValidPin = function(pin) {
  
 const isEmpty = function (value){
    
-    if (typeof value ==="string"&& value.trim().length === 0) return false;
+    if (typeof value ==="string" && value.trim().length === 0) return false;
+    if(typeof value === "undefined" || value === null || value.trim().length === 0 ) return false
     return true;
 };
 
@@ -64,13 +65,14 @@ const isVAlidISBN = function (ISBN){
     
 };
 
-/*---------------------------------------------ISBN VALIDATION-------------------------------------------*/
+/*--------------------------------------------- DATE VALIDATION-------------------------------------------*/
  
 const isVAlidDate = function (releasedAt){
     const DateRegex = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/;
     return DateRegex.test(releasedAt);
     
 };
+
 
 
 

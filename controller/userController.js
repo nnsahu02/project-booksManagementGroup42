@@ -30,14 +30,14 @@ exports.createUser = async (req, res) => {
         }
 
         if (Object.keys(rest).length != 0) { //Checking extra attributes are added or not 
-            return res.status(400).send({status: false, msg: "Not allowed to add extra attributes" })
+            return res.status(400).send({ status: false, msg: "Not allowed to add extra attributes" })
         }
 
 
         /*----------------Checking Valid Title or Not-------------------*/
 
         if (title != "Mr" && title != "Mrs" && title != "Miss") { //Title checking
-            return res.status(400).send({status: false, msg: "Not have appropiate title" })
+            return res.status(400).send({ status: false, msg: "Not have appropiate title" })
         }
 
 
@@ -82,7 +82,7 @@ exports.createUser = async (req, res) => {
 
         let duplicatePhone = await userModel.findOne({ phone: data.phone }) //Duplicate Phone no checking
         if (duplicatePhone) {
-            return res.status(200).send({ status: false,msg: "Phone Number already registered" })
+            return res.status(200).send({ status: false, msg: "Phone Number already registered" })
         }
 
         if (!isValidEmail(email)) { // Email validation
@@ -91,7 +91,7 @@ exports.createUser = async (req, res) => {
 
         let duplicateEmail = await userModel.findOne({ email: email }) //Duplicate Email checking
         if (duplicateEmail) {
-            return res.status(200).send({ status: false,msg: "Email already registered" })
+            return res.status(200).send({ status: false, msg: "Email already registered" })
         }
 
         if (!isValidPassword(password)) { // Password validation
@@ -112,8 +112,6 @@ exports.createUser = async (req, res) => {
     }
 
 }
-
-
 
 //>-------------------------------------------------- LOGIN USER --------------------------------------------------<//
 
@@ -139,18 +137,18 @@ exports.login = async (req, res) => {
 
         let token = jwt.sign(
             {
-                userId: user._id.toString(),
+                userId: user._id.toString()
             },
             "group42-very-very-secret-key",
             { expiresIn: '60m' }
         );
-        console.log(token)
+        //console.log(token)
         res.setHeader("x-auth-token", token);
         res.status(200).send({ status: true, token: token, tokenCreatedAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss"), message: "Your token will be expired in 60 Minutes." });
 
     }
     catch (error) {
-        res.status(500).send({status: false, msg: error.message })
+        res.status(500).send({ status: false, msg: error.message })
     }
 
 };

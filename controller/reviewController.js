@@ -29,12 +29,23 @@ exports.review = async (req, res) => {
         }
         let { bookId, reviewedBy, reviewedAt, rating, review, isDeleted, ...rest } = bodyData
 
+        if(!reviewedBy){
+            bodyData.reviewedBy = 'Guest'
+        }
 
-        if (!reviewedBy || !rating || !review) {
+        if(!isEmpty(reviewedBy) ){
+            bodyData.reviewedBy = 'Guest'
+        }
+
+        if (!isValidName(reviewedBy)) {
+            bodyData.reviewedBy = 'Guest'
+        }
+
+        if ( !rating || !review) {
             return res.status(400).send({ status: false, message: "Please provide all attributes." })
         }
 
-        if (reviewedBy == "" || rating == "" || review == "") {
+        if ( rating == "" || review == "") {
             return res.status(400).send({ status: false, message: "Please provide all attributes value." })
         }
 
@@ -42,7 +53,7 @@ exports.review = async (req, res) => {
             return res.status(400).send({ status: false, message: "Not allowed to add extra attributes." })
         }
 
-        if (!isEmpty(reviewedBy) || !isEmpty(rating) || !isEmpty(review)) {
+        if (!isEmpty(rating) || !isEmpty(review)) {
             return res.status(400).send({ status: false, message: "Value must be given in all attributes." })
         }
 
@@ -55,9 +66,6 @@ exports.review = async (req, res) => {
             return res.status(400).send({ status: false, message: "Rating range should in between 1 to 5." })
         }
 
-        if (!isValidName(reviewedBy)) {
-            return res.status(400).send({ status: false, status: false, message: "Please Provide Proper Name." })
-        }
 
         let creatreview = await reviewModel.create(bodyData)
 
@@ -76,8 +84,19 @@ exports.review = async (req, res) => {
             review: creatreview.review
         }
 
+        const reviewDetail = {
+            title : findBook.title,
+            excerpt : findBook.excerpt,
+            userId : findBook.userId,
+            ISBN : findBook.ISBN,
+            category : findBook.category,
+            subcategory : findBook.subcategory,
+            reviews : findBook.reviews,
+            reviewsData : reviewData
+        }
 
-        res.status(201).send({ status: true, message: "success", data: reviewData })
+
+        res.status(201).send({ status: true, message: "success", data: reviewDetail })
 
     }
     catch (err) {
@@ -110,16 +129,15 @@ exports.updateReview = async (req, res) => {
 
         const findBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
         if (!findBook) {
-            return res.status(404).send({status: false, message: "No book found with this Id." })
+            return res.status(404).send({ status: false, message: "No book found with this Id." })
         }
 
         const findReview = await reviewModel.findOne({ _id: reviewId, isDeleted: false })
         if (!findReview) {
-            return res.status(404).send({status: false, message: "No review found with this Id." })
+            return res.status(404).send({ status: false, message: "No review found with this Id." })
         }
 
         const bodyData = req.body
-
 
 
         if (Object.keys(bodyData).length == 0) {
@@ -169,11 +187,22 @@ exports.updateReview = async (req, res) => {
         }
 
         const reviewupdate = await reviewModel.findOneAndUpdate(
-            { _id: reviewId },
+            { _id: reviewId, bookId: bookId },
             { $set: { reviewedBy: reviewedBy, rating: rating, review: review } },
             { new: true }
         )
-        res.status(200).send({ status: true, msg: "updated", data: reviewupdate })
+
+        let finalData = {
+            title: bookDetails.title,
+            excerpt: bookDetails.excerpt,
+            userId: bookDetails.userId,
+            category: bookDetails.category,
+            subcategory: bookDetails.subcategory,
+            isDeleted: false,
+            reviews: bookDetails.reviews,
+            reviewsData: reviewupdate
+        }
+        res.status(200).send({ status: true, msg: "updated", data: finalData })
 
 
     } catch (err) {
@@ -208,12 +237,12 @@ exports.DeleteReview = async (req, res) => {
 
         const findBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
         if (!findBook) {
-            return res.status(404).send({status: false, message: "No book found with this Id." })
+            return res.status(404).send({ status: false, message: "No book found with this Id." })
         }
 
         const findReview = await reviewModel.findOne({ _id: reviewId, isDeleted: false })
         if (!findReview) {
-            return res.status(404).send({status: false, message: "No review found with this Id." })
+            return res.status(404).send({ status: false, message: "No review found with this Id." })
         }
 
 
@@ -243,7 +272,7 @@ exports.DeleteReview = async (req, res) => {
 
         const reviewDelete = await reviewModel.findOneAndUpdate(
             { _id: reviewId },
-            { $set: {isDeleted : true } },
+            { $set: { isDeleted: true } },
             { new: true }
         )
 
