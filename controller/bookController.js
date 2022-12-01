@@ -2,6 +2,7 @@ const bookModel = require("../model/bookModel")
 const userModel = require('../model/userModel')
 const reviewModel = require('../model/reviewModel')
 const { isValidObjectId } = require('mongoose')
+const moment = require('moment')
 
 
 
@@ -214,17 +215,20 @@ exports.updateBook = async (req, res) => {
 
         let data = req.body
 
-        const { title, excerpt, releasedAt, ISBN } = data
+        const { title, excerpt, releasedAt, ISBN, ...rest } = data
 
         if (Object.keys(data).length == 0) {
-            return res.status(400).send({ msg: "Body is empty" })
+            return res.status(400).send({status: false, message: "Body is empty" })
+        }
+        if (Object.keys(rest).length > 0) {
+            return res.status(400).send({status: false, message: "extra attribute is not allowed." })
         }
 
         /*------------------------------------- CHECKING EMPTY AND STRING ------------------------------------------*/
 
-        // if (Object.values(title).length == 0 || Object.values(excerpt).length == 0 || Object.values(releasedAt).length == 0 || Object.values(ISBN).length == 0) {
-        //     return res.status(400).send({ status: false, message: "The value field can not be empty." })
-        // }
+        if (!(title || excerpt || releasedAt || ISBN)) {
+            return res.status(400).send({ status: false, message: "The value field can not be empty." })
+        }
 
         if (title) {
 
@@ -329,7 +333,7 @@ exports.DeleteBook = async function (req, res) {
 
         let deleteByBookId = await bookModel.findOneAndUpdate(
             { _id: bookId, isDeleted: false },
-            { isDeleted: true, deletedAt: Date.now() },
+            { isDeleted: true, deletedAt:moment().format("dddd, MMMM Do YYYY, h:mm:ss") },
             { new: true }
         )
 

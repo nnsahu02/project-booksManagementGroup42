@@ -42,9 +42,8 @@ const isValidPin = function(pin) {
 /*---------------------------------------------VALUE VALIDATION-------------------------------------------*/
  
 const isEmpty = function (value){
-   
     if (typeof value ==="string" && value.trim().length === 0) return false;
-    if(typeof value === "undefined" || value === null || value.trim().length === 0 ) return false
+    if(typeof value === "undefined" || value === null ) return false
     return true;
 };
 

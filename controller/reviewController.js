@@ -29,6 +29,14 @@ exports.review = async (req, res) => {
         }
         let { bookId, reviewedBy, reviewedAt, rating, review, isDeleted, ...rest } = bodyData
 
+        const findBook = await bookModel.findById(bookId)
+        if(!findBook){
+            return res.status(404).send({status : false, message : "The book you want to review is not exist!"})
+        }
+        if(findBook.isDeleted == true){
+            return res.status(400).send({status : false, message : "The book you want to review is deleted!"})
+        }
+
         if(!reviewedBy){
             bodyData.reviewedBy = 'Guest'
         }
@@ -41,7 +49,7 @@ exports.review = async (req, res) => {
             bodyData.reviewedBy = 'Guest'
         }
 
-        if ( !rating || !review) {
+        if ( !rating || !review ) {
             return res.status(400).send({ status: false, message: "Please provide all attributes." })
         }
 
@@ -57,12 +65,9 @@ exports.review = async (req, res) => {
             return res.status(400).send({ status: false, message: "Value must be given in all attributes." })
         }
 
-        let findBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
-        if (!findBook) {
-            return res.status(404).send({ status: false, message: "No book found with this Id." })
-        }
+        
 
-        if (rating < 0 || rating > 5) {
+        if (rating < 1 || rating > 5 || rating == 0 ) {
             return res.status(400).send({ status: false, message: "Rating range should in between 1 to 5." })
         }
 
@@ -74,6 +79,8 @@ exports.review = async (req, res) => {
             { $inc: { reviews: 1 } },
             { new: true }
         )
+
+        const reviewdetails = await reviewModel.findOne({bookId : bookId, isDeleted : false}).count()
 
         let reviewData = {
             _id: creatreview._id,
@@ -91,7 +98,7 @@ exports.review = async (req, res) => {
             ISBN : findBook.ISBN,
             category : findBook.category,
             subcategory : findBook.subcategory,
-            reviews : findBook.reviews,
+            reviews : reviewdetails,
             reviewsData : reviewData
         }
 
@@ -127,9 +134,12 @@ exports.updateReview = async (req, res) => {
             return res.status(400).send({ status: false, message: "Please provide a valid reviewId." })
         }
 
-        const findBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
+        const findBook = await bookModel.findById(bookId)
         if (!findBook) {
             return res.status(404).send({ status: false, message: "No book found with this Id." })
+        }
+        if(findBook.isDeleted == true){
+            return res.status(400).send({status : false, message : "The book you want to update is already deleted!"})
         }
 
         const findReview = await reviewModel.findOne({ _id: reviewId, isDeleted: false })
@@ -234,17 +244,6 @@ exports.DeleteReview = async (req, res) => {
         if (!isValidObjectId(reviewId)) {
             return res.status(400).send({ status: false, message: "Please provide a valid reviewId." })
         }
-
-        const findBook = await bookModel.findOne({ _id: bookId, isDeleted: false })
-        if (!findBook) {
-            return res.status(404).send({ status: false, message: "No book found with this Id." })
-        }
-
-        const findReview = await reviewModel.findOne({ _id: reviewId, isDeleted: false })
-        if (!findReview) {
-            return res.status(404).send({ status: false, message: "No review found with this Id." })
-        }
-
 
         const bookDetails = await bookModel.findById(bookId)
         if (!bookDetails) {

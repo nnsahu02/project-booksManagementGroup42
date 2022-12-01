@@ -7,12 +7,12 @@ const bookSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
-            trim : true
+            trim: true
         },
         excerpt: {
             type: String,
             required: true,
-            trim : true
+            trim: true
         },
         userId: {
             type: ObjectId,
@@ -27,12 +27,12 @@ const bookSchema = new mongoose.Schema(
         category: {
             type: String,
             required: true,
-            trim : true
+            trim: true
         },
         subcategory: {
             type: String,
             required: true,
-            trim : true
+            trim: true
         },
         reviews: {
             type: Number,
@@ -43,14 +43,14 @@ const bookSchema = new mongoose.Schema(
             default: false
         },
         deletedAt: {
-            type: Date,
-            default: null
+            type: String,
+            format: "date"
         },
         releasedAt: {
             type: String,
             required: true,
-            format : "date"
-        
+            format: "date"
+
         }
     }, { timestamps: true }
 )
