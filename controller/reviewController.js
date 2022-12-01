@@ -28,6 +28,8 @@ exports.review = async (req, res) => {
             return res.status(400).send({ status: false, message: "Please Provide data in the body." })
         }
         let { bookId, reviewedBy, reviewedAt, rating, review, isDeleted, ...rest } = bodyData
+        
+        rating = rating.toString()
 
         const findBook = await bookModel.findById(bookId)
         if(!findBook){
@@ -67,7 +69,7 @@ exports.review = async (req, res) => {
 
         
 
-        if (rating < 1 || rating > 5 || rating == 0 ) {
+        if (rating < 1 || rating > 5 ) {
             return res.status(400).send({ status: false, message: "Rating range should in between 1 to 5." })
         }
 
@@ -134,44 +136,6 @@ exports.updateReview = async (req, res) => {
             return res.status(400).send({ status: false, message: "Please provide a valid reviewId." })
         }
 
-        const findBook = await bookModel.findById(bookId)
-        if (!findBook) {
-            return res.status(404).send({ status: false, message: "No book found with this Id." })
-        }
-        if(findBook.isDeleted == true){
-            return res.status(400).send({status : false, message : "The book you want to update is already deleted!"})
-        }
-
-        const findReview = await reviewModel.findOne({ _id: reviewId, isDeleted: false })
-        if (!findReview) {
-            return res.status(404).send({ status: false, message: "No review found with this Id." })
-        }
-
-        const bodyData = req.body
-
-
-        if (Object.keys(bodyData).length == 0) {
-            return res.status(400).send({ status: false, message: "Please Provide data in the body." })
-        }
-        let { reviewedBy, rating, review, ...rest } = bodyData
-
-
-        if (!reviewedBy || !rating || !review) {
-            return res.status(400).send({ status: false, message: "Please provide all attributes." })
-        }
-
-        if (reviewedBy == "" || rating == "" || review == "") {
-            return res.status(400).send({ status: false, message: "Please provide all attributes value." })
-        }
-
-        if (Object.keys(rest).length != 0) {
-            return res.status(400).send({ status: false, message: "Not allowed to add extra attributes." })
-        }
-
-        if (!isEmpty(reviewedBy) || !isEmpty(rating) || !isEmpty(review)) {
-            return res.status(400).send({ status: false, message: "Value must be given in all attributes." })
-        }
-
         const bookDetails = await bookModel.findById(bookId)
         if (!bookDetails) {
             return res.status(404).send({ status: false, message: "No book Found with this Id!" })
@@ -195,6 +159,33 @@ exports.updateReview = async (req, res) => {
         if (bookIdfrmReview != bookId) {
             return res.status(400).send({ status: false, message: "This Book has no review." })
         }
+
+        const bodyData = req.body
+
+
+        if (Object.keys(bodyData).length == 0) {
+            return res.status(400).send({ status: false, message: "Please Provide data in the body." })
+        }
+        let { reviewedBy, rating, review, ...rest } = bodyData
+
+        rating = rating.toString()
+
+        if (!reviewedBy || !rating || !review) {
+            return res.status(400).send({ status: false, message: "Please provide all attributes." })
+        }
+
+        if (Object.keys(rest).length != 0) {
+            return res.status(400).send({ status: false, message: "Not allowed to add extra attributes." })
+        }
+
+        if (!isEmpty(reviewedBy) || !isEmpty(rating) || !isEmpty(review)) {
+            return res.status(400).send({ status: false, message: "Value must be given in all attributes." })
+        }
+
+        if (rating < 1 || rating > 5  ) {
+            return res.status(400).send({ status: false, message: "Rating range should in between 1 to 5." })
+        }
+
 
         const reviewupdate = await reviewModel.findOneAndUpdate(
             { _id: reviewId, bookId: bookId },

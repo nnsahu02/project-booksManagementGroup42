@@ -37,7 +37,7 @@ exports.createUser = async (req, res) => {
         /*----------------Checking Valid Title or Not-------------------*/
 
         if (title != "Mr" && title != "Mrs" && title != "Miss") { //Title checking
-            return res.status(400).send({ status: false, msg: "Not have appropiate title" })
+            return res.status(400).send({ status: false, message: "Not have appropiate title" })
         }
 
 
@@ -95,7 +95,7 @@ exports.createUser = async (req, res) => {
         }
 
         if (!isValidPassword(password)) { // Password validation
-            return res.status(400).send({ status: false, message: "Your password must have 8 to 15 characters, contain at least one number or symbol, and have a mixture of uppercase and lowercase letters." })
+            return res.status(400).send({ status: false, message: "Your password must have 8 to 15 characters and The password must be mixture of uppercase, lowercase, number and special character." })
         }
 
         if (!isValidPin(data.address.pincode)) {
@@ -122,6 +122,13 @@ exports.login = async (req, res) => {
 
         let email = req.body.email;
         let password = req.body.password;
+
+        if(!email){
+            return res.status(400).send({status : false, message : "email is required."})
+        }
+        if(!password){
+            return res.status(400).send({status : false, message : "password is required."})
+        }
 
         if (!isValidEmail(email)) { // Email validation
             return res.status(400).send({ status: false, message: "Please provide valid Email" })
