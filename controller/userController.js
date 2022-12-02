@@ -25,8 +25,44 @@ exports.createUser = async (req, res) => {
 
         let { title, name, phone, email, password, address, ...rest } = data //Destructuring
 
-        if (!title || !name || !phone || !email || !password || !address || !address.street || !address.city || !address.pincode) {
-            return res.status(400).send({ status: false, message: "All fields must be required" })
+        if (!title) {
+            return res.status(400).send({ status: false, message: "title must be required" })
+        }
+        if (!name) {
+            return res.status(400).send({ status: false, message: "name must be required" })
+        }
+        if (!phone) {
+            return res.status(400).send({ status: false, message: "phone must be required" })
+        }
+        if (!email) {
+            return res.status(400).send({ status: false, message: "email must be required" })
+        }
+        if (!password) {
+            return res.status(400).send({ status: false, message: "password must be required" })
+        }
+
+        if (address) {
+            if (!address.street || !address.city || !address.pincode) {
+                return res.status(400).send({ status: false, message: "if you are using Adress attripute Please provide adress data." })
+            }
+            if (address.street) {
+                if (!isEmpty(address.street)) {
+                    return res.status(400).send({ status: false, message: "The value of street can not be empty." })
+                }
+            }
+            if (address.city) {
+                if (!isEmpty(address.city)) {
+                    return res.status(400).send({ status: false, message: "The value of city can not be empty." })
+                }
+            }
+            if (address.pincode) {
+                if (!isEmpty(address.pincode)) {
+                    return res.status(400).send({ status: false, message: "The value of street can not be empty." })
+                }
+                if (!isValidPin(data.address.pincode)) {
+                    return res.status(400).send({ status: false, message: "Please provide valid Pin Code" })
+                }
+            }
         }
 
         if (Object.keys(rest).length != 0) { //Checking extra attributes are added or not 
@@ -58,18 +94,18 @@ exports.createUser = async (req, res) => {
         if (!isEmpty(password)) {
             return res.status(400).send({ status: false, message: "Password is required" })
         }
-        if (!isEmpty(address)) {
-            return res.status(400).send({ status: false, message: "Address is required" })
-        }
-        if (!isEmpty(address.street)) {
-            return res.status(400).send({ status: false, message: "Street is required" })
-        }
-        if (!isEmpty(address.city)) {
-            return res.status(400).send({ status: false, message: "City is required" })
-        }
-        if (!isEmpty(address.pincode)) {
-            return res.status(400).send({ status: false, message: "Pin Code is required" })
-        }
+        // if (!isEmpty(address)) {
+        //     return res.status(400).send({ status: false, message: "Address is required" })
+        // }
+        // if (!isEmpty(address.street)) {
+        //     return res.status(400).send({ status: false, message: "Street is required" })
+        // }
+        // if (!isEmpty(address.city)) {
+        //     return res.status(400).send({ status: false, message: "City is required" })
+        // }
+        // if (!isEmpty(address.pincode)) {
+        //     return res.status(400).send({ status: false, message: "Pin Code is required" })
+        // }
 
 
         if (!isValidName(name)) { // Name validation
@@ -98,9 +134,9 @@ exports.createUser = async (req, res) => {
             return res.status(400).send({ status: false, message: "Your password must have 8 to 15 characters and The password must be mixture of uppercase, lowercase, number and special character." })
         }
 
-        if (!isValidPin(data.address.pincode)) {
-            return res.status(400).send({ status: false, message: "Please provide valid Pin Code" })
-        }
+        // if (!isValidPin(data.address.pincode)) {
+        //     return res.status(400).send({ status: false, message: "Please provide valid Pin Code" })
+        // }
 
         /*-----------------------------------CREATING USER-----------------------------------------------------*/
 
@@ -123,11 +159,11 @@ exports.login = async (req, res) => {
         let email = req.body.email;
         let password = req.body.password;
 
-        if(!email){
-            return res.status(400).send({status : false, message : "email is required."})
+        if (!email) {
+            return res.status(400).send({ status: false, message: "email is required." })
         }
-        if(!password){
-            return res.status(400).send({status : false, message : "password is required."})
+        if (!password) {
+            return res.status(400).send({ status: false, message: "password is required." })
         }
 
         if (!isValidEmail(email)) { // Email validation

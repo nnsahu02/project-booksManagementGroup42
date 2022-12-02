@@ -271,7 +271,7 @@ exports.DeleteReview = async (req, res) => {
             { $inc: { reviews: -1 } },
             { new: true }
         )
-        res.status(200).send({ status: true, msg: "deleted", data: reviewDelete })
+        return res.status(200).send({ status: true, message: "The review is successfully deleted.", data: reviewDelete })
 
 
     } catch (err) {

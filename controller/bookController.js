@@ -19,6 +19,9 @@ exports.createBook = async (req, res) => {
 
         let { title, excerpt, userId, ISBN, category, subcategory, releasedAt, isDeleted, reviews, ...rest } = bodyData //Destructuring
 
+        let titleUpper = title.charAt(0).toUpperCase() + title.slice(1)
+        req.body.title = titleUpper
+       
         if (Object.keys(rest).length != 0) { //Checking extra attributes are added or not 
             return res.status(400).send({ msg: "Not allowed to add extra attributes" })
         }
@@ -144,6 +147,9 @@ exports.getBookFrmQuery = async (req, res) => {
 
         const bookData = await bookModel.find(queryData).select({ title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 }).sort({ title: 1 })
 
+        const lowerBookData = bookData[0].title
+        console.log(lowerBookData)
+
         if (bookData.length == 0) {
             return res.status(404).send({ status: false, message: "No book found!" })
         }
@@ -180,18 +186,20 @@ exports.getBooksfrmParam = async (req, res) => {
             return res.status(400).send({ status: false, message: "The book wIth this Id is already Deleted!" })
         }
 
-        const reviewData = await reviewModel.find({ bookId: bookId, isDeleted: false })
+        const reviewData = await reviewModel.find({ bookId: bookId, isDeleted: false }).select({isDeleted : 0, createdAt : 0, updatedAt : 0, __v : 0})
 
         const booksData = {
+            _id : bookData._id,
             title: bookData.title,
             excerpt: bookData.excerpt,
             userId: bookData.userId,
-            ISBN: bookData.ISBN,
             category: bookData.category,
             subcategory: bookData.subcategory,
+            isDeleted: bookData.isDeleted,
             reviews: reviewData.length,
-            deletedAt: reviewData.deletedAt,
-            isDeleted: reviewData.isDeleted,
+            releasedAt : bookData.releasedAt,
+            createdAt : bookData.createdAt,
+            updatedAt : bookData.updatedAt,
             reviewData: reviewData
         }
 
