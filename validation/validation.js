@@ -52,7 +52,7 @@ const isEmpty = function (value){
 
 
 const isValidBookTitle = function (name){
-    const nameRegex = /^[a-zA-Z0-9]+(([a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/;
+    const nameRegex = /^[a-zA-Z0-9:]+(([a-zA-Z0-9: ])?[a-zA-Z0-9:]*)*$/;
     return nameRegex.test(name);
 };
 
