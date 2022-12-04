@@ -183,7 +183,7 @@ exports.login = async (req, res) => {
                 userId: user._id.toString()
             },
             "group42-very-very-secret-key",
-            { expiresIn: '60m' }
+            { expiresIn: '2m' }
         );
 
         console.log(token)
