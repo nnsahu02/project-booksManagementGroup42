@@ -1,31 +1,35 @@
 const bookModel = require("../model/bookModel")
+
 const userModel = require('../model/userModel')
+
 const reviewModel = require('../model/reviewModel')
+
 const { isValidObjectId } = require('mongoose')
+
 const moment = require('moment')
 
 
 
-//>---------------------------------------------- VALIDATION FUNCTION ------------------------------------------------<//
+//>----------------------------------- VALIDATION FUNCTION ----------------------------------<//
 
 const validation = require('../validation/validation')
+
 let { isEmpty, isValidBookTitle, isVAlidISBN, isVAlidDate } = validation
 
-//>-------------------------------------------------- CREAT BOOKS --------------------------------------------------<//
+
+//>-------------------------------------- CREAT BOOKS ----------------------------------------<//
 
 exports.createBook = async (req, res) => {
+
     try {
         let bodyData = req.body
 
         let { title, excerpt, userId, ISBN, category, subcategory, releasedAt, isDeleted, reviews, ...rest } = bodyData //Destructuring
 
-        let titleUpper = title.charAt(0).toUpperCase() + title.slice(1)
-        req.body.title = titleUpper
        
         if (Object.keys(rest).length != 0) { //Checking extra attributes are added or not 
-            return res.status(400).send({ msg: "Not allowed to add extra attributes" })
+            return res.status(400).send({ status:false,message: "Not allowed to add extra attributes" })
         }
-
 
         if (!title) {
             return res.status(400).send({ status: false, message: "title is required." })
@@ -58,7 +62,7 @@ exports.createBook = async (req, res) => {
             return res.status(400).send({ status: false, message: "The Date is in inValid Format." })
         }
 
-        /*------------------------------------- CHECKING EMPTY AND STRING ------------------------------------------*/
+        /*-------------------------------- CHECKING EMPTY AND STRING ----------------------------*/
 
         if (!isEmpty(title)) {
             return res.status(400).send({ status: false, message: "Title is required" })
@@ -83,10 +87,11 @@ exports.createBook = async (req, res) => {
         }
 
 
-        /*---------------------------------------------- CHECKING UNIQUE ---------------------------------------------*/
+        /*----------------------------------- CHECKING UNIQUE -----------------------------*/
 
 
         const titleCheck = await bookModel.findOne({ title })
+
         const ISBNCheck = await bookModel.findOne({ ISBN })
 
         if (titleCheck) {
@@ -96,11 +101,12 @@ exports.createBook = async (req, res) => {
             return res.status(400).send({ status: false, message: "This ISBN is already exist." })
         }
 
-        /*-----------------------------------------------------------------------------------------------------------*/
 
+        /*---------------------------------------------------------------------------------------*/
+        
 
-        let checkUserId = await userModel.findById(userId)
-        if (!checkUserId) { return res.status(404).send({ status: false, message: "user not found" }) }
+        let titleUpper = title.charAt(0).toUpperCase() + title.slice(1)
+        req.body.title = titleUpper
 
         let createBook = await bookModel.create(bodyData)
 
@@ -111,13 +117,14 @@ exports.createBook = async (req, res) => {
     }
 }
 
-//>------------------------------------------------------------------------------------------------------------------<//
+//>-------------------------------------------------------------------------------------------------------------<//
 
 
 
-//>-------------------------------------------- GET BOOKS BY QUERY FILTER -------------------------------------------<//
+//>------------------------------- GET BOOKS BY QUERY FILTER ----------------------------------<//
 
 exports.getBookFrmQuery = async (req, res) => {
+
     try {
 
         const queryData = req.query
@@ -164,15 +171,15 @@ exports.getBookFrmQuery = async (req, res) => {
 
 
 
-//>---------------------------------------------- GET BOOKS FROM PARAM ----------------------------------------------<//
+//>-------------------------------------- GET BOOKS FROM PARAM -------------------------------------<//
 
 exports.getBooksfrmParam = async (req, res) => {
     try {
         const bookId = req.params.bookId
 
-        if (!bookId) {
-            return res.status(400).send({ status: false, message: "bookId is required" })
-        }
+        // if (!bookId) {
+        //     return res.status(400).send({ status: false, message: "bookId is required" })
+        // }
 
         const bookData = await bookModel.findById(bookId)
 
@@ -208,13 +215,13 @@ exports.getBooksfrmParam = async (req, res) => {
     }
 }
 
-//>------------------------------------------------------------------------------------------------------------------<//
+//>------------------------------------------------------------------------------------------------------------<//
 
 
-
-//>------------------------------------------------ UPDATE BOOKS ----------------------------------------------------<//
+//>-------------------------------------- UPDATE BOOKS --------------------------------------------<//
 
 exports.updateBook = async (req, res) => {
+
     try {
         const bookId = req.params.bookId;
 
@@ -229,7 +236,7 @@ exports.updateBook = async (req, res) => {
             return res.status(400).send({status: false, message: "extra attribute is not allowed." })
         }
 
-        /*------------------------------------- CHECKING EMPTY AND STRING ------------------------------------------*/
+       
 
         if (!(title || excerpt || releasedAt || ISBN)) {
             return res.status(400).send({ status: false, message: "The value field can not be empty." })
@@ -309,7 +316,7 @@ exports.updateBook = async (req, res) => {
     }
 };
 
-//>------------------------------------------------------------------------------------------------------------------<//
+             //>----------------------------------------------------------------------------------<//
 
 
 //>---------------------------------------------- DELETE BOOKS ----------------------------------------------<//
@@ -319,22 +326,22 @@ exports.DeleteBook = async function (req, res) {
     try {
         const bookId = req.params.bookId
 
-        if (!bookId) {
-            return res.status(400).send({ status: false, message: "Provide bookId" })
-        }
+        // if (!bookId) {
+        //     return res.status(400).send({ status: false, message: "Provide bookId" })
+        // }
 
         if (!isValidObjectId(bookId)) {
             return res.status(400).send({ status: false, message: "Please Provide valid BookId" })
         }
 
-        const bookDetails = await bookModel.findById(bookId)
-        if (!bookDetails) {
-            return res.status(404).send({ status: false, message: "No book Found with this Id!" })
-        }
+        // const bookDetails = await bookModel.findById(bookId)
+        // if (!bookDetails) {
+        //     return res.status(404).send({ status: false, message: "No book Found with this Id!" })
+        // }
 
-        if (bookDetails.isDeleted == true) {
-            return res.status(400).send({ status: false, message: "The book wIth this Id is already Deleted!" })
-        }
+        // if (bookDetails.isDeleted == true) {
+        //     return res.status(400).send({ status: false, message: "The book wIth this Id is already Deleted!" })
+        // }
 
         let deleteByBookId = await bookModel.findOneAndUpdate(
             { _id: bookId, isDeleted: false },
@@ -365,13 +372,16 @@ exports.DeleteBook = async function (req, res) {
         if (!deleteByBookId) {
             return res.status(404).send({ status: false, message: "No Book document found" })
         }
+
         return res.status(200).send({ status: true, message: "Book successfully deleted.", data: deleteData })
-    } catch (error) {
+
+    } 
+    catch (error) {
         return res.status(500).send({ status: false, message: error.message })
     }
 }
 
-//>------------------------------------------------------------------------------------------------------------------<//
+//>----------------------------------------------------------------------------------------------------------<//
 
 
 

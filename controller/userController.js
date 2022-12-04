@@ -1,22 +1,25 @@
 const jwt = require('jsonwebtoken')
+
 const moment = require('moment')
 
 const userModel = require('../model/userModel')
 
 
-//>-------------------------------------------------- VALIDATION --------------------------------------------------<//
+//>------------------------------------- VALIDATION -------------------------------------<//
 
 
 const validation = require('../validation/validation')
+
 let { isValidName, isValidMobile, isValidEmail, isValidPassword, isValidPin, isEmpty } = validation //Destructuring
 
 
-//>-------------------------------------------------- CREAT USER --------------------------------------------------<//
+//>-------------------------------------- CREAT USER -----------------------------------<//
 
 
 exports.createUser = async (req, res) => {
 
     try {
+
         let data = req.body
 
         if (Object.keys(data).length == 0) {// Checking body is empty or not
@@ -32,7 +35,7 @@ exports.createUser = async (req, res) => {
             return res.status(400).send({ status: false, message: "name must be required" })
         }
         if (!phone) {
-            return res.status(400).send({ status: false, message: "phone must be required" })
+            return res.status(400).send({ status: false, message: "phone no must be required" })
         }
         if (!email) {
             return res.status(400).send({ status: false, message: "email must be required" })
@@ -42,19 +45,23 @@ exports.createUser = async (req, res) => {
         }
 
         if (address) {
+
             if (!address.street || !address.city || !address.pincode) {
-                return res.status(400).send({ status: false, message: "if you are using Adress attripute Please provide adress data." })
+                return res.status(400).send({ status: false, message: "If you are using Address attripute Please provide adress data." })
             }
+
             if (address.street) {
                 if (!isEmpty(address.street)) {
                     return res.status(400).send({ status: false, message: "The value of street can not be empty." })
                 }
             }
+
             if (address.city) {
                 if (!isEmpty(address.city)) {
                     return res.status(400).send({ status: false, message: "The value of city can not be empty." })
                 }
             }
+
             if (address.pincode) {
                 if (!isEmpty(address.pincode)) {
                     return res.status(400).send({ status: false, message: "The value of street can not be empty." })
@@ -94,23 +101,18 @@ exports.createUser = async (req, res) => {
         if (!isEmpty(password)) {
             return res.status(400).send({ status: false, message: "Password is required" })
         }
-        // if (!isEmpty(address)) {
-        //     return res.status(400).send({ status: false, message: "Address is required" })
-        // }
-        // if (!isEmpty(address.street)) {
-        //     return res.status(400).send({ status: false, message: "Street is required" })
-        // }
-        // if (!isEmpty(address.city)) {
-        //     return res.status(400).send({ status: false, message: "City is required" })
-        // }
-        // if (!isEmpty(address.pincode)) {
-        //     return res.status(400).send({ status: false, message: "Pin Code is required" })
-        // }
 
 
         if (!isValidName(name)) { // Name validation
             return res.status(400).send({ status: false, message: "Please Provide Proper Name" })
         }
+
+        /* Example of valid Mobile Numbers  +919367788755
+                                            09898293041
+                                            918765431234
+                                            +16308520397
+                                            786-307-3615 
+                                         */
 
         if (!isValidMobile(phone)) {  // Phone validation
             return res.status(400).send({ status: false, message: "Phone Number is wrong" })
@@ -131,25 +133,22 @@ exports.createUser = async (req, res) => {
         }
 
         if (!isValidPassword(password)) { // Password validation
-            return res.status(400).send({ status: false, message: "Your password must have 8 to 15 characters and The password must be mixture of uppercase, lowercase, number and special character." })
+            return res.status(400).send({ status: false, message: "Your password must have 8 to 15 characters and the password must be mixture of uppercase, lowercase, number and special character." })
         }
 
-        // if (!isValidPin(data.address.pincode)) {
-        //     return res.status(400).send({ status: false, message: "Please provide valid Pin Code" })
-        // }
-
-        /*-----------------------------------CREATING USER-----------------------------------------------------*/
+        /*-----------------------------------CREATING USER-----------------------------------------*/
 
         let userCreate = await userModel.create(data)
         res.status(201).send({ status: true, data: userCreate })
     }
+
     catch (error) {
         res.status(500).send({ status: true, message: error.message })
     }
 
 }
 
-//>-------------------------------------------------- LOGIN USER --------------------------------------------------<//
+//>--------------------------- LOGIN USER ---------------------------<//
 
 
 exports.login = async (req, res) => {
@@ -175,6 +174,7 @@ exports.login = async (req, res) => {
         }
 
         let user = await userModel.findOne({ email: email, password: password });
+
         if (!user)
             return res.status(400).send({ status: false, msg: "email or password is not corerct" });
 
@@ -185,8 +185,11 @@ exports.login = async (req, res) => {
             "group42-very-very-secret-key",
             { expiresIn: '60m' }
         );
-        //console.log(token)
+
+        console.log(token)
+
         res.setHeader("x-auth-token", token);
+        
         res.status(200).send({ status: true, token: token, tokenCreatedAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss"), message: "Your token will be expired in 60 Minutes." });
 
     }

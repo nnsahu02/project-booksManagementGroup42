@@ -34,7 +34,7 @@
   userId: {ObjectId, mandatory, refs to user model},
   ISBN: {string, mandatory, unique},
   category: {string, mandatory},
-  subcategory: [string, mandatory],
+  subcategory: {string, mandatory},
   reviews: {number, default: 0, comment: Holds number of reviews of this book},
   deletedAt: {Date, when the document is deleted}, 
   isDeleted: {boolean, default: false},
@@ -135,7 +135,7 @@
 - In case of unauthorized access return an appropirate error message.
 
 ## Testing 
-- To test these apis create a new collection in Postman named Project 4 Books Management 
+- To test these apis create a new collection in Postman named Project 3 Books Management 
 - Each api should have a new request in this collection
 - Each request in the collection should be rightly named. Eg Create user, Create book, Get books etc
 - Each member of each team should have their tests in running state
@@ -252,7 +252,7 @@ Refer below sample
     "excerpt": "book body",
     "userId": ObjectId("88abc190ef0288abc190ef02")
     "category": "Book",
-    "subcategory": ["Non fiction", "Self Help"],
+    "subcategory": "Non fiction",
     "isDeleted": false,
     "reviews": 4,
     "releasedAt": "2021-09-17T04:25:07.803Z"
@@ -307,7 +307,7 @@ Refer below sample
     "excerpt": "book body",
     "userId": ObjectId("88abc190ef0288abc190ef02")
     "category": "Book",
-    "subcategory": "Non fiction", "Self Help"],
+    "subcategory": "Non fiction",
     "isDeleted": false,
     "reviews": 0,
     "releasedAt": "2021-09-17"

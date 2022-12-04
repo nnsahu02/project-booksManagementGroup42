@@ -22,13 +22,11 @@ const userModel = new mongoose.Schema(
       type: String,
       require: true,
       unique: true,
-      lowercase: true,
-      trim : true
+      lowercase: true
     },
     password: {
       type: String,
-      require: true,
-      trim : true
+      require: true
     },
     address: {
       street: {

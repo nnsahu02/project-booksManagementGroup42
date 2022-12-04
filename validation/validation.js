@@ -74,5 +74,4 @@ const isVAlidDate = function (releasedAt){
 
 
 
-
-module.exports = {isValidName, isValidMobile, isValidEmail, isValidPassword, isValidPin, isEmpty,isValidBookTitle,isVAlidISBN,isVAlidDate}
+module.exports = {isValidName, isValidMobile, isValidEmail, isValidPassword, isValidPin, isEmpty, isValidBookTitle,isVAlidISBN, isVAlidDate}
