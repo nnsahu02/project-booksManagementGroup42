@@ -35,9 +35,6 @@ exports.review = async (req, res) => {
 
         const BookId = req.params.bookId
 
-        // if (!BookId) {
-        //     return res.status(400).send({ status: false, message: "Please provide BookId in params." })
-        // }
 
         if (!isValidObjectId(BookId)) {
             return res.status(400).send({ status: false, message: "Please provide a valid BookId." })
@@ -69,15 +66,14 @@ exports.review = async (req, res) => {
             bodyData.reviewedBy = 'Guest'
         }
         
-        rating = rating.toString()
+       if(rating===0){
+        return res.status(400).send({ status: false, message: "rating cannot be 0" })
+       }
 
         if ( !rating || !review ) {
             return res.status(400).send({ status: false, message: "Please provide all attributes." })
         }
 
-        // if ( rating == "" || review == "") {
-        //     return res.status(400).send({ status: false, message: "Please provide all attributes value." })
-        // }
 
         
         if (!isEmpty(rating) || !isEmpty(review)) {
@@ -96,8 +92,6 @@ exports.review = async (req, res) => {
             { new: true }
         )
 
-        //  const reviewdetails = await reviewModel.find({bookId : BookId, isDeleted : false}).count()
-        //  console.log(reviewdetails)
 
         let reviewData = {
             _id: creatreview._id,
@@ -141,13 +135,6 @@ exports.updateReview = async (req, res) => {
 
         const reviewId = req.params.reviewId
 
-        // if (!bookId) {
-        //     return res.status(400).send({ status: false, message: "Please provide BookId in params." })
-        // }
-
-        // if (!reviewId) {
-        //     return res.status(400).send({ status: false, message: "Please provide reviewId in params." })
-        // }
 
         if (!isValidObjectId(bookId)) {
             return res.status(400).send({ status: false, message: "Please provide a valid BookId." })
@@ -188,21 +175,38 @@ exports.updateReview = async (req, res) => {
         }
         let { reviewedBy, rating, review, ...rest } = bodyData
 
-        rating = rating.toString()
-
-        if (!reviewedBy || !rating || !review) {
-            return res.status(400).send({ status: false, message: "Please provide all attributes." })
-        }
-
         if (Object.keys(rest).length != 0) {
             return res.status(400).send({ status: false, message: "Not allowed to add extra attributes." })
         }
 
-        if (!isEmpty(reviewedBy) || !isEmpty(rating) || !isEmpty(review)) {
-            return res.status(400).send({ status: false, message: "Value must be given in all attributes." })
+
+        if(!(reviewedBy || rating || review)){
+            return res.status(400).send({ status: false, message: "Please Provide value to attributes" })
         }
 
-        if (rating < 1 || rating > 5  ) {
+        if(reviewedBy){
+            if (!isEmpty(reviewedBy) || reviewedBy ==="") {
+                return res.status(400).send({ status: false, message: "Value must be given in reviwedBy attributes." })
+            }
+        }
+
+        if(rating){
+
+            if (!isEmpty(rating) || rating ===0 || rating =="") {
+                return res.status(400).send({ status: false, message: "Value must be given in rating attributes." })
+            }
+
+        }
+
+        if(review){
+
+            if (!isEmpty(review) || review =="") {
+                return res.status(400).send({ status: false, message: "Value must be given in review attributes." })
+            }
+        }
+
+
+        if (rating < 1 || rating > 5 ) {
             return res.status(400).send({ status: false, message: "Rating range should in between 1 to 5." })
         }
 
@@ -245,13 +249,6 @@ exports.DeleteReview = async (req, res) => {
 
         const reviewId = req.params.reviewId
 
-        // if (!bookId) {
-        //     return res.status(400).send({ status: false, message: "Please provide BookId in params." })
-        // }
-
-        // if (!reviewId) {
-        //     return res.status(400).send({ status: false, message: "Please provide reviewId in params." })
-        // }
 
         if (!isValidObjectId(bookId)) {
             return res.status(400).send({ status: false, message: "Please provide a valid BookId." })

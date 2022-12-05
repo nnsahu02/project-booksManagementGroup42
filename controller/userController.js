@@ -183,14 +183,14 @@ exports.login = async (req, res) => {
                 userId: user._id.toString()
             },
             "group42-very-very-secret-key",
-            { expiresIn: '2m' }
+            { expiresIn: '5h' }
         );
 
         console.log(token)
 
         res.setHeader("x-auth-token", token);
         
-        res.status(200).send({ status: true, token: token, tokenCreatedAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss"), message: "Your token will be expired in 2 Minutes." });
+        res.status(200).send({ status: true, token: token, tokenCreatedAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss"), message: "Your token will be expired in 5 hours." });
 
     }
     catch (error) {
