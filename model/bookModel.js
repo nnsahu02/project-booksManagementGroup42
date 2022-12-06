@@ -39,6 +39,12 @@ const bookSchema = new mongoose.Schema(
             type: Number,
             default: 0
         },
+        bookCover : {
+            type : String,
+            trim : true,
+            unique : true,
+            require : true
+        },
         isDeleted: {
             type: Boolean,
             default: false
@@ -51,7 +57,6 @@ const bookSchema = new mongoose.Schema(
             type: String,
             required: true,
             format: "date"
-
         }
     }, { timestamps: true }
 )

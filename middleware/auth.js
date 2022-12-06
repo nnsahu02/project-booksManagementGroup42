@@ -26,7 +26,7 @@ exports.authentication = async (req, res, next) => {
             }
             else {
                 req.token = decodedToken
-                console.log("Authentication Successful")
+                //console.log("Authentication Successful")
             }
 
             next()
@@ -75,7 +75,7 @@ exports.authorisation = async (req, res, next) => {
             return res.status(403).send({ status: false, message: "Access Denied!" })
         }
 
-        console.log("Authorization Successful")
+        //console.log("Authorization Successful")
         next()
     }
     catch (err) {
@@ -119,7 +119,7 @@ exports.authoriseforUpdate = async (req, res, next) => {
             console.log("Authorization Failed!!")
             return res.status(403).send({ status: false, message: "Access Denied!" })
         }
-        console.log("Authorization Successful")
+        //console.log("Authorization Successful")
         next()
     }
 

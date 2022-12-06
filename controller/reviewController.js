@@ -11,7 +11,7 @@ const { isValidObjectId } = require('mongoose')
 
 const validation = require('../validation/validation')
 
-let { isValidName, isEmpty } = validation
+let { isValidName, isEmpty, isValidRating } = validation
 
 
 //>------------------------------------------ CREATING REVIEW ------------------------------------------<//
@@ -21,7 +21,7 @@ exports.review = async (req, res) => {
     try {
 
         let bodyData = req.body
-        
+
         let { bookId, reviewedBy, reviewedAt, rating, review, isDeleted, ...rest } = bodyData
 
         if (Object.keys(bodyData).length == 0) {
@@ -32,9 +32,7 @@ exports.review = async (req, res) => {
             return res.status(400).send({ status: false, message: "Not allowed to add extra attributes." })
         }
 
-
         const BookId = req.params.bookId
-
 
         if (!isValidObjectId(BookId)) {
             return res.status(400).send({ status: false, message: "Please provide a valid BookId." })
@@ -43,45 +41,40 @@ exports.review = async (req, res) => {
         bodyData.bookId = BookId
 
         bodyData.reviewedAt = moment().format("dddd, MMMM Do YYYY, h:mm:ss")
-        
+
         const findBook = await bookModel.findById(bodyData.bookId)
 
-        if(!findBook){
-            return res.status(404).send({status : false, message : "The book you want to review is not exist!"})
+        if (!findBook) {
+            return res.status(404).send({ status: false, message: "The book you want to review is not exist!" })
         }
 
-        if(findBook.isDeleted == true){
-            return res.status(400).send({status : false, message : "The book you want to review is deleted!"})
+        if (findBook.isDeleted == true) {
+            return res.status(400).send({ status: false, message: "The book you want to review is deleted!" })
         }
 
-        if(!reviewedBy){
+        if (!reviewedBy) {
             bodyData.reviewedBy = 'Guest'
         }
 
-        if(!isEmpty(reviewedBy) ){
+        if (!isEmpty(reviewedBy)) {
             bodyData.reviewedBy = 'Guest'
         }
 
         if (!isValidName(reviewedBy)) {
             bodyData.reviewedBy = 'Guest'
         }
-        
-       if(rating===0){
-        return res.status(400).send({ status: false, message: "rating cannot be 0" })
-       }
 
-        if ( !rating || !review ) {
+
+        if (!isValidRating(rating)) {
+            return res.status(400).send({ status: false, message: "The rating is invalid,Rating range should be in between 1 to 5." })
+        }
+
+        if (!rating || !review) {
             return res.status(400).send({ status: false, message: "Please provide all attributes." })
         }
 
-
-        
         if (!isEmpty(rating) || !isEmpty(review)) {
             return res.status(400).send({ status: false, message: "Value must be given in all attributes." })
-        }
-        
-        if (rating < 1 || rating > 5 ) {
-            return res.status(400).send({ status: false, message: "Rating range should in between 1 to 5." })
         }
 
         let creatreview = await reviewModel.create(bodyData)
@@ -91,7 +84,6 @@ exports.review = async (req, res) => {
             { $inc: { reviews: 1 } },
             { new: true }
         )
-
 
         let reviewData = {
             _id: creatreview._id,
@@ -103,14 +95,14 @@ exports.review = async (req, res) => {
         }
 
         const reviewDetail = {
-            title : findBook.title,
-            excerpt : findBook.excerpt,
-            userId : findBook.userId,
-            ISBN : findBook.ISBN,
-            category : findBook.category,
-            subcategory : findBook.subcategory,
-            reviews : findBook.reviews + 1,
-            reviewsData : reviewData
+            title: findBook.title,
+            excerpt: findBook.excerpt,
+            userId: findBook.userId,
+            ISBN: findBook.ISBN,
+            category: findBook.category,
+            subcategory: findBook.subcategory,
+            reviews: findBook.reviews + 1,
+            reviewsData: reviewData
         }
 
 
@@ -139,7 +131,7 @@ exports.updateReview = async (req, res) => {
         if (!isValidObjectId(bookId)) {
             return res.status(400).send({ status: false, message: "Please provide a valid BookId." })
         }
-        
+
         if (!isValidObjectId(reviewId)) {
             return res.status(400).send({ status: false, message: "Please provide a valid reviewId." })
         }
@@ -180,37 +172,35 @@ exports.updateReview = async (req, res) => {
         }
 
 
-        if(!(reviewedBy || rating || review)){
+        if (!(reviewedBy || rating || review)) {
             return res.status(400).send({ status: false, message: "Please Provide value to attributes" })
         }
 
-        if(reviewedBy){
-            if (!isEmpty(reviewedBy) || reviewedBy ==="") {
+        if (reviewedBy) {
+            if (!isEmpty(reviewedBy) || reviewedBy === "") {
                 return res.status(400).send({ status: false, message: "Value must be given in reviwedBy attributes." })
             }
         }
 
-        if(rating){
+        if (rating) {
 
-            if (!isEmpty(rating) || rating ===0 || rating =="") {
+            if (!isEmpty(rating)) {
                 return res.status(400).send({ status: false, message: "Value must be given in rating attributes." })
             }
 
+            if(!isValidRating(rating)){
+                return res.status(400).send({ status: false, message: "Invalid rating, Rating range should be in between 1 to 5." })
+            }
         }
 
-        if(review){
+        if (review) {
 
-            if (!isEmpty(review) || review =="") {
+            if (!isEmpty(review) || review == "") {
                 return res.status(400).send({ status: false, message: "Value must be given in review attributes." })
             }
         }
 
-
-        if (rating < 1 || rating > 5 ) {
-            return res.status(400).send({ status: false, message: "Rating range should in between 1 to 5." })
-        }
-
-
+       
         const reviewupdate = await reviewModel.findOneAndUpdate(
             { _id: reviewId, bookId: bookId },
             { $set: { reviewedBy: reviewedBy, rating: rating, review: review } },
@@ -244,7 +234,7 @@ exports.updateReview = async (req, res) => {
 exports.DeleteReview = async (req, res) => {
 
     try {
-        
+
         const bookId = req.params.bookId
 
         const reviewId = req.params.reviewId
@@ -253,7 +243,7 @@ exports.DeleteReview = async (req, res) => {
         if (!isValidObjectId(bookId)) {
             return res.status(400).send({ status: false, message: "Please provide a valid BookId." })
         }
-        
+
         if (!isValidObjectId(reviewId)) {
             return res.status(400).send({ status: false, message: "Please provide a valid reviewId." })
         }

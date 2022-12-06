@@ -4,6 +4,7 @@ const router = express.Router();
 const userController = require('../controller/userController');
 const bookController = require('../controller/bookController');
 const reviewController = require('../controller/reviewController')
+const awsController = require('../controller/awsController')
 const auth = require('../middleware/auth');
 
 //USER//
@@ -15,6 +16,8 @@ router.post('/register', userController.createUser);
 
 router.post('/login', userController.login);
 
+//LNK CREATE//
+router.post('/write-file-aws', awsController.createLink)
 
 //BOOK//
 /*.........................//3// CREAT BOOKS //.............................................*/

@@ -24,11 +24,10 @@ exports.createBook = async (req, res) => {
     try {
         let bodyData = req.body
 
-        let { title, excerpt, userId, ISBN, category, subcategory, releasedAt, isDeleted, reviews, ...rest } = bodyData //Destructuring
+        let { title, excerpt, userId, ISBN, category, subcategory, releasedAt, isDeleted, reviews, bookCover, ...rest } = bodyData //Destructuring
 
-       
         if (Object.keys(rest).length != 0) { //Checking extra attributes are added or not 
-            return res.status(400).send({ status:false,message: "Not allowed to add extra attributes" })
+            return res.status(400).send({ status: false, message: "Not allowed to add extra attributes" })
         }
 
         if (!title) {
@@ -60,6 +59,9 @@ exports.createBook = async (req, res) => {
         }
         if (!isVAlidDate(releasedAt)) {
             return res.status(400).send({ status: false, message: "The Date is in inValid Format." })
+        }
+        if (!bookCover) {
+            return res.status(400).send({ status: false, message: "bookCover is required." })
         }
 
         /*-------------------------------- CHECKING EMPTY AND STRING ----------------------------*/
@@ -103,10 +105,6 @@ exports.createBook = async (req, res) => {
 
 
         /*---------------------------------------------------------------------------------------*/
-        
-
-        let titleUpper = title.charAt(0).toUpperCase() + title.slice(1)
-        req.body.title = titleUpper
 
         let createBook = await bookModel.create(bodyData)
 
@@ -152,14 +150,22 @@ exports.getBookFrmQuery = async (req, res) => {
 
         queryData["isDeleted"] = false //added isDeleted attribute in queryData
 
-        const bookData = await bookModel.find(queryData).select({ title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 }).sort({ title: 1 })
+        const bookData = await bookModel.find(queryData).select({ title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
+        
+        const sortBook = bookData.sort((a, b) => {
+            let fa = a.title.toLowerCase()
+            fb = b.title.toLowerCase()
+            if (fa < fb) return -1;
+            if (fa > fb) return 1;
+            return 0
+        })
 
         if (bookData.length == 0) {
             return res.status(404).send({ status: false, message: "No book found!" })
         }
 
 
-        return res.status(200).send({ status: true, message: "Books list", data: bookData })
+        return res.status(200).send({ status: true, message: "Books list", data: sortBook })
 
     }
     catch (err) {
@@ -177,10 +183,6 @@ exports.getBooksfrmParam = async (req, res) => {
     try {
         const bookId = req.params.bookId
 
-        // if (!bookId) {
-        //     return res.status(400).send({ status: false, message: "bookId is required" })
-        // }
-
         const bookData = await bookModel.findById(bookId)
 
         if (!bookData) {
@@ -190,10 +192,10 @@ exports.getBooksfrmParam = async (req, res) => {
             return res.status(400).send({ status: false, message: "The book wIth this Id is already Deleted!" })
         }
 
-        const reviewData = await reviewModel.find({ bookId: bookId, isDeleted: false }).select({isDeleted : 0, createdAt : 0, updatedAt : 0, __v : 0})
+        const reviewData = await reviewModel.find({ bookId: bookId, isDeleted: false }).select({ isDeleted: 0, createdAt: 0, updatedAt: 0, __v: 0 })
 
         const booksData = {
-            _id : bookData._id,
+            _id: bookData._id,
             title: bookData.title,
             excerpt: bookData.excerpt,
             userId: bookData.userId,
@@ -201,9 +203,9 @@ exports.getBooksfrmParam = async (req, res) => {
             subcategory: bookData.subcategory,
             isDeleted: bookData.isDeleted,
             reviews: reviewData.length,
-            releasedAt : bookData.releasedAt,
-            createdAt : bookData.createdAt,
-            updatedAt : bookData.updatedAt,
+            releasedAt: bookData.releasedAt,
+            createdAt: bookData.createdAt,
+            updatedAt: bookData.updatedAt,
             reviewData: reviewData
         }
 
@@ -230,13 +232,11 @@ exports.updateBook = async (req, res) => {
         const { title, excerpt, releasedAt, ISBN, ...rest } = data
 
         if (Object.keys(data).length == 0) {
-            return res.status(400).send({status: false, message: "Body is empty" })
+            return res.status(400).send({ status: false, message: "Body is empty" })
         }
         if (Object.keys(rest).length > 0) {
-            return res.status(400).send({status: false, message: "extra attribute is not allowed." })
+            return res.status(400).send({ status: false, message: "extra attribute is not allowed." })
         }
-
-       
 
         if (!(title || excerpt || releasedAt || ISBN)) {
             return res.status(400).send({ status: false, message: "The value field can not be empty." })
@@ -316,36 +316,23 @@ exports.updateBook = async (req, res) => {
     }
 };
 
-             //>----------------------------------------------------------------------------------<//
+//>------------------------------------------------------------------------------------------------------------------<//
 
 
-//>---------------------------------------------- DELETE BOOKS ----------------------------------------------<//
+//>-------------------------------------------------- DELETE BOOKS ---------------------------------------------------<//
 
 
 exports.DeleteBook = async function (req, res) {
     try {
         const bookId = req.params.bookId
 
-        // if (!bookId) {
-        //     return res.status(400).send({ status: false, message: "Provide bookId" })
-        // }
-
         if (!isValidObjectId(bookId)) {
             return res.status(400).send({ status: false, message: "Please Provide valid BookId" })
         }
 
-        // const bookDetails = await bookModel.findById(bookId)
-        // if (!bookDetails) {
-        //     return res.status(404).send({ status: false, message: "No book Found with this Id!" })
-        // }
-
-        // if (bookDetails.isDeleted == true) {
-        //     return res.status(400).send({ status: false, message: "The book wIth this Id is already Deleted!" })
-        // }
-
         let deleteByBookId = await bookModel.findOneAndUpdate(
             { _id: bookId, isDeleted: false },
-            { isDeleted: true, deletedAt:moment().format("dddd, MMMM Do YYYY, h:mm:ss") },
+            { isDeleted: true, deletedAt: moment().format("dddd, MMMM Do YYYY, h:mm:ss") },
             { new: true }
         )
 
@@ -375,7 +362,7 @@ exports.DeleteBook = async function (req, res) {
 
         return res.status(200).send({ status: true, message: "Book successfully deleted.", data: deleteData })
 
-    } 
+    }
     catch (error) {
         return res.status(500).send({ status: false, message: error.message })
     }

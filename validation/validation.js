@@ -72,6 +72,12 @@ const isVAlidDate = function (releasedAt){
     
 };
 
+/*--------------------------------------------- RATING VALIDATION-------------------------------------------*/
+
+const isValidRating = function (rating){
+    const ratingRegex = /^[1-5_\/\s,.-]+$/
+    return ratingRegex.test(rating)
+}
 
 
-module.exports = {isValidName, isValidMobile, isValidEmail, isValidPassword, isValidPin, isEmpty, isValidBookTitle,isVAlidISBN, isVAlidDate}
+module.exports = {isValidName, isValidMobile, isValidEmail, isValidPassword, isValidPin, isEmpty, isValidBookTitle,isVAlidISBN, isVAlidDate,isValidRating}
